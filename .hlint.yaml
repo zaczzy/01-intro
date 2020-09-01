@@ -1,0 +1,17 @@
+# HLint configuration file
+##########################
+
+- arguments: [--only="Use map", --only="Use String"]
+
+- functions:
+  - {name: head, within: []} # head can only appear in no modules
+  - {name: tail, within: []} 
+  - {name: Maybe.fromJust, within: []} 
+
+- ignore: {name: Use head}
+- ignore: {name: Use guards}
+- ignore: {name: "Use lambda-case"}
+- ignore: {name: "Use $>"}
+- ignore: {name: "Use tuple-section"}
+
+

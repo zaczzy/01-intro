@@ -121,7 +121,7 @@ shiftPoly _ [] = []
 shiftPoly d (xy : xys) = shiftXY d xy : shiftPoly d xys
 
 map :: (a -> b) -> [a] -> [b]
-map f [] = []
+map _ [] = []
 map f (x : xs) = f x : map f xs
 
 toUpperString' :: String -> String

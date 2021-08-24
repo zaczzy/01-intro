@@ -92,7 +92,8 @@ bigInteger = 12345678901234567890
 {-
 This is in contrast to the `Int` type, for word-sized integers (machine
 dependent). Numbers are overloaded in Haskell, so the type annotation tells
-the compiler how to interpret this expression.
+the compiler how to interpret this expression. (And, note the warning
+issued by the compiler for this out of range number!)
 -}
 
 bigInt :: Int
@@ -773,7 +774,8 @@ l7 = ['h', 'e', 'l', 'l', 'o', ' ', '5', '5', '2', '!']
 What is the value of l7?
 -}
 
---- >>> l7
+-- >>> l7
+--
 
 {-
 "Cons"tructing Lists
@@ -802,8 +804,9 @@ Try evaluating `c1` and `c2`.
 -}
 
 -- >>> c1
-
+--
 -- >>> c2
+--
 
 {-
 And check out the type of `c3`.
@@ -835,8 +838,9 @@ Try evaluating `s1` and `s2`.
 -}
 
 -- >>> s1
-
+--
 -- >>> s2
+--
 
 {-
 Syntactic Sugar for lists

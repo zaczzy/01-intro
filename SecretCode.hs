@@ -78,6 +78,10 @@ So, we can use `lookup` to encode a particular character. If we don't have a map
 character in our code, (i.e. for punctuation) we should leave it alone.
 -}
 
+-- >>> encodeChar 'a'
+-- 't'
+-- >>> encodeChar '.'
+-- '.
 encodeChar :: Char -> Char
 encodeChar c = undefined
 
@@ -94,6 +98,8 @@ that `String`s are just lists of `Char`s, there is a perfect higher-order
 function in `Lec3` that we can use:
 -}
 
+-- >>> encodeLine "abc defgh"
+-- "the quick"
 encodeLine :: String -> String
 encodeLine = undefined
 

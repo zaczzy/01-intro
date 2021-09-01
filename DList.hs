@@ -2,25 +2,16 @@
 ---
 fulltitle: "In class exercise: Difference lists"
 ---
-
-In this problem, you will use first-class functions to implement an alternative
-version of lists, called `DList`s, short for *difference lists*.
 -}
 
 module DList where
 
-import Test.HUnit
-
 {-
-Remember that you can execute the definitions in this module by loading it
-into ghci.  In the terminal, you can use the command
-
-      stack ghci DList.hs
-
-to automatically start ghci and load the module.
-
 Motivation
 ----------
+
+In this exercise, you will use first-class functions to implement an alternative
+version of lists, called `DList`s, short for *difference lists*.
 
 `DList`s support O(1) append operations on lists, making them very
 useful for append-heavy uses, such as logging and traversing
@@ -28,7 +19,7 @@ tree-like data structures in linear time.  (An implementation of this data
 structure is available on [hackage](http://hackage.haskell.org/package/dlist)
 but try to complete it on your own. No peeking!)
 
-See the micro-benchmark section below for experiments you can do once you
+See the micro-benchmark section for experiments you can do once you
 have completed the implementation.
 
 Implementation
@@ -66,31 +57,6 @@ parameter with `[]` to get a normal list. However, we can also fill in the
 parameter with another list, effectively appending [1, 2, 3] to the beginning
 of that other list.
 
-See if you can figure out how to define the following standard list operations
-for this new type of `DList`s. Remember that `DList a` is just a synonym for `[a] -> [a]`.
--}
-
-empty :: DList a
-empty = undefined
-
-singleton :: a -> DList a
-singleton x = undefined
-
-append :: DList a -> DList a -> DList a
-append = undefined
-
-cons :: a -> DList a -> DList a
-cons = undefined
-
-{-
-Now write a function to convert a regular list to a `DList` using the above
-definitions and `foldr`.
--}
-
-fromList :: [a] -> DList a
-fromList = undefined
-
-{-
 Once we have constructed a `DList`, the *only* way to observe it is to
 convert it to a list. This data structure does not support any other form of
 pattern matching.
@@ -100,22 +66,55 @@ toList :: DList a -> [a]
 toList x = x []
 
 {-
-And that's it.  You're on your own for testing here. Write some unit tests for
-the above functions. You should ensure that 'DList's behave like normal lists.
+See if you can figure out how to define the following standard list operations
+for this new type of `DList`s. Remember that `DList a` is just a synonym for `[a] -> [a]`.
 -}
 
-testDList :: IO ()
-testDList = do
-  _ <-
-    runTestTT $
-      TestList
-        [ toList empty ~?= ([] :: [Char])
-        ]
-  return ()
+-- | Create an empty DList
+-- >>> toList empty
+-- []
+empty :: DList a
+empty = undefined
+
+-- | Create a DList containing a single element
+-- >>> toList (singleton "a")
+-- ["a"]
+singleton :: a -> DList a
+singleton x = undefined
+
+-- | Append two DLists together
+-- >>> toList ((singleton "a") `append` (singleton "b"))
+-- ["a","b"]
+append :: DList a -> DList a -> DList a
+append = undefined
+
+-- | Construct a DList from a head element and tail
+-- >>> toList (cons "a" (singleton "b"))
+-- ["a","b"]
+cons :: a -> DList a -> DList a
+cons = undefined
+
+{-
+Now write a function to convert a regular list to a `DList` using the above
+definitions and `foldr`.
+-}
+
+-- | convert a normal list to a DList
+-- >>> toList (fromList [1,2,3])
+-- [1,2,3]
+fromList :: [a] -> DList a
+fromList = undefined
 
 {-
 Micro-benchmarks
 ----------------
+
+Remember that you can execute the definitions in this module by loading it
+into ghci.  In the terminal, you can use the command
+
+      stack ghci DList.hs
+
+to automatically start ghci and load the module.
 
 If you'd like to see the difference between using (++) with regular lists and
 `append` using DLists, in GHCi you can type
@@ -257,7 +256,7 @@ micro6 = last (dlistIvoryTowerReverse bigList)
 
 (Of course, it is often better to use the standard library definition of
 common operations. How does the built-in operation, which has been optimized
-for GHC compare?)
+for GHC, compare?)
 -}
 
 micro7 :: Int

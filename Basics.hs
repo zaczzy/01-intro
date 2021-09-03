@@ -62,6 +62,7 @@ Try clicking on "Evaluate..." below.
 -}
 
 -- >>> 3 * (4 + 5)
+-- 27
 
 {-
 A Haskell module (like this one) is a list of *definitions*. These definitions
@@ -76,6 +77,7 @@ We can ask VSCode to calculate these values, just as we did above.
 -}
 
 -- >>> ex
+-- 27
 
 {-
 Whenever we give a name to an expression, it is a good idea to also write down
@@ -104,12 +106,14 @@ Compare the value of a extra-large `Integer`
 -}
 
 -- >>> bigInteger
+-- 12345678901234567890
 
 {-
 with an `Int`
 -}
 
 -- >>> bigInt
+-- -6101065172474983726
 
 {-
 Above, we declared the type of an expression separately from giving it a
@@ -118,6 +122,7 @@ still annotate it with its type using `::`.
 -}
 
 -- >>> 31 * (42 + 56) :: Integer
+-- 3038
 
 {-
 More generally, the type annotation can be attached to any subexpression, not
@@ -125,6 +130,7 @@ just at the top level.
 -}
 
 -- >>> (31 :: Integer) * (42 + 56)
+-- 3038
 
 {-
 It is good style to annotate the type of *every* declaration in a Haskell
@@ -149,20 +155,26 @@ using the same overloaded syntax.
 -}
 
 -- >>> 31 * (42 + 56) :: Double    -- double precision floating point
+-- 3038.0
 
 {-
 Furthermore, you'll also find characters, strings and boolean values.
 -}
 
 -- >>> 'a' :: Char                 -- characters
+-- 'a'
 
 -- >>> "abcd" :: String            -- strings
+-- "abcd"
 
 -- >>> "cis" ++ "552"              -- string concatenation
+-- "cis552"
 
 -- >>> True :: Bool                -- boolean values
+-- True
 
 -- >>> 1 <= 3 || False && 3 > 2    -- boolean operators, comparisons
+-- True
 
 {-
 What is a little different about Haskell is that everything is an expression,
@@ -171,6 +183,7 @@ expressions.
 -}
 
 -- >>> (if ex > 28 then 1 else 0) + 2 :: Int
+-- 2
 
 {-
 Now the last basic type, shown below, is subtle. It is a special constant,
@@ -181,6 +194,7 @@ this basic type is that there is only *one* value with type `()`.
 -}
 
 -- >>> () :: ()            -- 'unit' (both value and type have the same syntax)
+-- ()
 
 {-
 What is Abstraction?
@@ -210,12 +224,14 @@ We call functions by providing them with arguments.
 -}
 
 -- >>> pat 31 42 56
+-- 3038
 
 {-
 No parentheses are necessary, unless the argument itself is a compound expression.
 -}
 
 -- >>> pat (30 + 1) 42 56
+-- 3038
 
 {-
 The important question is not "What does this function do?"
@@ -472,6 +488,12 @@ query2 = do
   n <- getLine
   return n
 
+-- My notes: when calling getLine, you need an input of unit. But not when using <-
+query3 :: IO String
+query3 = do
+  putStr "What is your name? "
+  return getLine ()
+
 {-
 Furthermore, there is no need to name a value if it is just going to be
 returned right away. This version is equivalent.
@@ -607,16 +629,19 @@ pat4 :: ((Int, Int), Int) -> Int
 pat4 ((a, b), c) = a * (b + c)
 
 -- >>> pat4 tup4
+-- 5
 
 pat5 :: (Int, (Int, Int)) -> Int
 pat5 (a, (b, c)) = a * (b + c)
 
 -- >>> pat5 tup5
+-- 5
 
 pat6 :: (Int, Int, Int) -> Int
 pat6 (a, b, c) = a * (b + c)
 
 -- >>> pat6 tup6
+-- 5
 
 {-
 We can stick anything in tuples, even IO actions.
@@ -700,7 +725,30 @@ error if it is ever evaluated.
 -}
 
 jn' :: Maybe (Maybe a) -> Maybe a
-jn' = undefined
+jn' (Just y) = y
+jn' Nothing = Nothing
+
+tjn'1 :: Test
+tjn'1 = jn (Just (Just 2)) ~?= jn' (Just (Just 2))
+
+tjn'2 :: Test
+tjn'2 = jn (Just Nothing :: Maybe (Maybe Int)) ~?= jn' (Just Nothing :: Maybe (Maybe Int))
+
+tjn'3 :: Test
+tjn'3 = jn (Nothing :: Maybe (Maybe Int)) ~?= jn' (Nothing :: Maybe (Maybe Int))
+
+runTestjn' :: IO Counts
+-- TODO : how to chain tests together
+-- runTestjn' = do
+--   runTestTT tjn'1
+--   runTestTT tjn'2
+--   runTestTT tjn'3
+runTestjn' = runTestTT (TestList [tjn'1, tjn'2, tjn'3])
+
+-- TODO: alternate answer?
+jn'' :: Maybe (Maybe a) -> Maybe a
+jn'' (Just (Just x)) = Just x
+jn'' _ = Nothing
 
 {-
 'Maybe' is useful for partial functions
@@ -775,6 +823,7 @@ What is the value of l7?
 -}
 
 -- >>> l7
+-- "hello 552!"
 --
 
 {-
@@ -804,8 +853,10 @@ Try evaluating `c1` and `c2`.
 -}
 
 -- >>> c1
+-- [True,False,False]
 --
 -- >>> c2
+-- [1]
 --
 
 {-
@@ -838,8 +889,10 @@ Try evaluating `s1` and `s2`.
 -}
 
 -- >>> s1
+-- "abc"
 --
 -- >>> s2
+-- "abc"
 --
 
 {-
@@ -956,7 +1009,10 @@ range :: Int -> Int -> [Int]
 **Step 3**: Define the function. This part is for you to do for your quiz.
 -}
 
-range i j = undefined
+range i j = if i <= j then i : range (i + 1) j else []
+
+-- rangeRev :: Int -> Int -> [Int]
+-- rangeRev i j = if j >= i then j : range i (j - 1) else []
 
 {-
 **Step 4**: Run the tests.
@@ -1004,7 +1060,9 @@ lists that have three or more elements.
 -}
 
 isLong :: [a] -> Bool
-isLong = undefined
+-- TODO: how to understand this pattern matching?
+isLong (_ : _ : _ : _) = True
+isLong _ = False
 
 testIsLong :: Test
 testIsLong =
@@ -1012,7 +1070,8 @@ testIsLong =
     [ not (isLong []) ~? "nil", -- can convert booleans to tests by naming them via `~?`
       not (isLong "a") ~? "one",
       not (isLong "ab") ~? "two",
-      isLong "abc" ~? "three"
+      isLong "abc" ~? "three",
+      isLong "abcd" ~? "four"
     ]
 
 {-
@@ -1095,7 +1154,8 @@ listIncr :: [Int] -> [Int]
 **Step 3**: Define the function.
 -}
 
-listIncr = undefined
+listIncr [] = []
+listIncr (x : xs) = (x + 1) : listIncr xs
 
 {-
 **Step 4**: Run the tests.

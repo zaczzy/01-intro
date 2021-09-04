@@ -5,3 +5,6 @@ The description of these modules and in-class exercises will be posted on the
 website](https://www.cis.upenn.edu/~cis552/current/schedule.html). Most of
 this code will not make sense without these descriptions.
 
+
+## Notes
+1. In ghci, call `:load Basics` to quickly recompile the file

@@ -488,7 +488,7 @@ query2 = do
   n <- getLine
   return n
 
--- My notes: when calling getLine, you need an input of unit. But not when using <-
+-- TODO: when calling getLine, you need an input of unit. But not when using <-
 query3 :: IO String
 query3 = do
   putStr "What is your name? "

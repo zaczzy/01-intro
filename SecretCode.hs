@@ -30,6 +30,7 @@ We'll call it the Brown Fox code.  Here's how it works:
 -}
 
 import Data.Char
+import Data.List (reverse)
 import Data.Maybe
 import Test.HUnit
 
@@ -83,7 +84,7 @@ character in our code, (i.e. for punctuation) we should leave it alone.
 -- >>> encodeChar '.'
 -- '.
 encodeChar :: Char -> Char
-encodeChar c = undefined
+encodeChar c = fromMaybe c (lookup c code)
 
 testEncodeChar =
   runTestTT $
@@ -98,10 +99,11 @@ that `String`s are just lists of `Char`s, there is a perfect higher-order
 function in `Lec3` that we can use:
 -}
 
+-- A partial function, partial application
 -- >>> encodeLine "abc defgh"
 -- "the quick"
 encodeLine :: String -> String
-encodeLine = undefined
+encodeLine = map encodeChar
 
 testEncodeLine = runTestTT $ TestList [encodeLine "abc defgh" ~?= "the quick"]
 
@@ -130,7 +132,10 @@ So...
 -}
 
 encodeContent :: String -> String
-encodeContent = undefined
+-- encodeContent = unlines $ reverse $ map encodeLine $ lines
+-- encodeContent = unlines . reverse . map encodeLine $ lines
+-- encodeContent xs = (unlines . reverse . map encodeLine . lines) xs
+encodeContent = unlines . reverse . map encodeLine . lines
 
 testEncodeContent =
   runTestTT $
@@ -156,11 +161,15 @@ Your function should read from the file 'f', but shouldn't overwrite the file
 with the encoded version. In Haskell, `FilePath`s are just strings, so we can
 create a new filename by appending a new extension to it.
 -}
-
+-- when IO collides with lazy evaluation of haskell
+-- bind <- ensures that outFile is available to the lines
+-- no such thing as a function that maps IO a -> a
+-- bind provides temporary access
 encodeFile :: FilePath -> IO ()
 encodeFile f = do
   let outFile = f ++ ".code"
-  undefined
+  str <- readFile f
+  writeFile outFile $ encodeContent str
 
 {-
 Finally, lets put it all together into a "main" function that reads in

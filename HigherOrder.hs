@@ -41,7 +41,7 @@ Or you can make a list containing the functions
 -}
 
 funs :: [Int -> Int]
-funs = undefined
+funs = [plus1, minus1]
 
 {-
 Taking Functions as Input
@@ -53,7 +53,8 @@ functions as input and return functions as output!  Consider:
 -}
 
 doTwice :: (a -> a) -> a -> a
-doTwice f x = f (f x)
+-- doTwice f x = f (f x)
+doTwice f = f . f
 
 dtTests :: Test
 dtTests =
@@ -162,12 +163,14 @@ Note the types of the above are `Int -> Int`.  That is, `plus10` and
 -}
 
 -- >>> plus10 3
+-- 13
 
 {-
 
 -}
 
 -- >>> plusn 10 3
+-- 13
 
 {-
 Partial Application
@@ -251,8 +254,9 @@ evaluation order. Remember that this means that you should not evaluate
 arguments before substituting them into the body of a defined function.
 
     doTwicePlus20 0 == doTwice (plus 20) 0        {- unfold doTwice -}
-                    == (plus 20) ((plus 20) 0)
-                    ... undefined (fill this part in) ...
+                    == (plus 20) ((plus 20) 0) {- unfold first plus-}
+                    == 20 + ((plus 20) 0) {- unfold second plus -}
+                    == 20 + (20 + 0)
                     == 20 + 20 + 0
                     == 40
 
@@ -301,7 +305,7 @@ mechanism to create such *anonymous* functions. For example,
     \x -> x + 1
 
 is an expression that corresponds to a function that takes an argument `x`
-and returns as output the value `x + 2`. The function has no name, but we
+and returns as output the value `x + 1`. The function has no name, but we
 can use it in the same place where we would write a function.
 -}
 
@@ -402,7 +406,7 @@ following test passes.
 -}
 
 singleton :: a -> [a]
-singleton = undefined
+singleton = (: [])
 
 singletonTest :: Test
 singletonTest = singleton True ~?= [True]
@@ -464,11 +468,16 @@ ex1 :: (a -> a) -> a -> a
 ex1 x y = doTwice doTwice x y
 
 {-
-
+ apply x 4 times to y.
+ x(x(x(x y)))
 -}
 
 ex1Test :: Test
-ex1Test = undefined
+ex1Test =
+  TestList
+    [ doTwice doTwice (* 2) 1 ~?= 16,
+      doTwice doTwice (subtract 1) 5 ~?= 1
+    ]
 
 {-
 Polymorphic Data Structures
@@ -632,7 +641,7 @@ toUpperString' :: String -> String
 toUpperString' xs = map toUpper xs
 
 shiftPoly' :: XY -> Polygon -> Polygon
-shiftPoly' d = undefined
+shiftPoly' d = map $ shiftXY d
 
 {-
 Much better.  But let's make sure our refactoring didn't break anything!
@@ -678,7 +687,7 @@ We can write this more cleanly with map, of course:
 -}
 
 listIncr' :: [Int] -> [Int]
-listIncr' = undefined
+listIncr' = map (+ 1)
 
 {-
 Computation Pattern: Folding
@@ -755,8 +764,12 @@ from our list-length function?
     len (x:xs) = 1 + len xs
 -}
 
+-- >>> len' "asdfs"
+-- 5
 len' :: [a] -> Int
-len' = undefined
+-- len' = foldr (\_ acc -> 1 + acc) 0
+-- len' = foldr (const (+ 1)) 0
+len' = foldr (const (1 +)) 0
 
 {-
 Once you have defined `len` in this way, see if you can trace how it
@@ -777,7 +790,7 @@ factorial 0 = 1
 factorial n = n * factorial (n -1)
 
 factorial' :: Int -> Int
-factorial' n = undefined
+factorial' n = foldr (*) 1 [1 .. n] -- TODO: is this correct?
 
 {-
 OK, one more.  The standard list library function `filter` has this
@@ -802,7 +815,8 @@ testFilter =
 Can we implement filter using foldr?  Sure!
 -}
 
-filter pred = undefined
+-- filter pred = foldr (\x acc -> if pred x then x : acc else acc) []
+filter pred = foldr (\x -> if pred x then (x :) else id) []
 
 runTests :: IO Counts
 runTests = runTestTT $ TestList [testMap, testFoldr, testFilter]
@@ -840,3 +854,15 @@ We'll see some other similar patterns later on.
 [4]: http://en.wikipedia.org/wiki/MapReduce "MapReduce"
 
 -}
+
+f :: [Char] -> [Char]
+f = \x -> ('a' : x)
+
+g :: String -> String
+g = append "a"
+  where
+    append :: String -> String -> String
+    append x y = x ++ y
+
+h :: (Bool -> a) -> [a]
+h x = [x True, x False]

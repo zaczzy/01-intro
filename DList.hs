@@ -49,7 +49,10 @@ parameter.
 -}
 
 dlist :: DList Int
-dlist = \x -> 1 : 2 : 3 : x -- end is "x"
+dlist x = 1 : 2 : 3 : x -- end is "x"
+
+-- >>> dlist [4,5,6]
+-- [1,2,3,4,5,6]
 
 {-
 This parameterization gives us flexibility. We can always fill in the
@@ -74,25 +77,30 @@ for this new type of `DList`s. Remember that `DList a` is just a synonym for `[a
 -- >>> toList empty
 -- []
 empty :: DList a
-empty = undefined
+empty = id
 
 -- | Create a DList containing a single element
 -- >>> toList (singleton "a")
 -- ["a"]
 singleton :: a -> DList a
-singleton x = undefined
+-- singleton = (:)
+-- singleton x = \t -> x : t
+singleton x = (x :)
 
 -- | Append two DLists together
 -- >>> toList ((singleton "a") `append` (singleton "b"))
 -- ["a","b"]
 append :: DList a -> DList a -> DList a
-append = undefined
+-- append a b = \t -> a (b t)
+-- append a b = a . b
+append = (.)
 
 -- | Construct a DList from a head element and tail
 -- >>> toList (cons "a" (singleton "b"))
 -- ["a","b"]
 cons :: a -> DList a -> DList a
-cons = undefined
+-- cons x y = singleton x `append` y
+cons = (.) . (:)
 
 {-
 Now write a function to convert a regular list to a `DList` using the above
@@ -103,7 +111,15 @@ definitions and `foldr`.
 -- >>> toList (fromList [1,2,3])
 -- [1,2,3]
 fromList :: [a] -> DList a
-fromList = undefined
+-- fromList x = \t -> x ++ t
+-- fromList xs = (xs ++)
+-- fromList = foldr cons empty
+fromList = (++)
+
+-- why do we write it like this?
+-- when building the list by always appending to the end of the list, dlist impl
+-- is faster
+-- drawback: you cannot pattern match on them, must convert to list first
 
 {-
 Micro-benchmarks
